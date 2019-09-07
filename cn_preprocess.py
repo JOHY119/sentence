@@ -6,11 +6,11 @@ import pickle as pkl
 import jieba
 import numpy as np
 
-embeddingsPath = 'embeddings/sgns.wiki.bigram-char'
-stopWordsPath = 'embeddings/stop_words.txt'
+embeddingsPath = 'D:/Data/sentiment/embeddings/sgns.weibo.bigram-char'
+stopWordsPath = 'D:/Data/sentiment/embeddings/stop_words.txt'
 
 # Train, Dev, and Test files
-folder = 'data/'
+folder = 'D:/Data/sentiment/waimai/'
 files = [folder + 'train.txt', folder + 'dev.txt', folder + 'test.txt']
 categories = ['neg', 'pos']
 
