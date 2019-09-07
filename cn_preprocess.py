@@ -6,7 +6,7 @@ import pickle as pkl
 import jieba
 import numpy as np
 
-embeddingsPath = 'D:/Data/sentiment/embeddings/sgns.weibo.bigram-char'
+embeddingsPath = 'D:/Data/sentiment/embeddings/sgns.wiki.bigram-char'
 stopWordsPath = 'D:/Data/sentiment/embeddings/stop_words.txt'
 
 # Train, Dev, and Test files
