@@ -3,15 +3,26 @@ import logging
 import pickle as pkl
 
 # We download English word embeddings from here https://www.cs.york.ac.uk/nlp/extvec/
+from pathlib import Path
+
 import jieba
 import numpy as np
 
-embeddingsPath = 'D:/Data/sentiment/embeddings/sgns.wiki.bigram-char'
-stopWordsPath = 'D:/Data/sentiment/embeddings/stop_words.txt'
+import my_path
+
+# embeddingsPath = 'D:/Data/sentiment/embeddings/sgns.wiki.bigram-char'
+# stopWordsPath = 'D:/Data/sentiment/embeddings/stop_words.txt'
+embeddingsPath = Path(my_path.embedding_dir, 'sgns.wiki.bigram-char')
+stopWordsPath = Path(my_path.embedding_dir, 'stop_words.txt')
+
+# outputFilePath = 'pkl/data.pkl.gz'
+outputFilePath = Path(my_path.pkl_dir, 'data.pkl.gz')
 
 # Train, Dev, and Test files
-folder = 'D:/Data/sentiment/shopping/'
-files = [folder + 'train.txt', folder + 'dev.txt', folder + 'test.txt']
+# folder = 'D:/Data/sentiment/shopping/'
+folder = Path(my_path.data_dir)
+files = [Path(folder, 'train.txt'), Path(folder, 'dev.txt'), Path(folder, 'test.txt')]
+# files = [folder + 'train.txt', folder + 'dev.txt', folder + 'test.txt']
 categories = ['neg', 'pos']
 
 
@@ -88,7 +99,7 @@ def readFile(filepath):
 
 if __name__ == '__main__':
 
-    outputFilePath = 'pkl/data.pkl.gz'
+    # outputFilePath = 'pkl/data.pkl.gz'
 
     trainDataset = readFile(files[0])
     devDataset = readFile(files[1])

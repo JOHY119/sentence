@@ -43,7 +43,12 @@ Dev-Accuracy: 79.09% (loss: 0.5046)
 Test-Accuracy: 77.44% (loss: 0.5163)
 """
 from __future__ import print_function
+
+from pathlib import Path
+
 import numpy as np
+
+import my_path
 
 np.random.seed(1337)  # for reproducibility
 
@@ -69,8 +74,11 @@ def wordIdxLookup(word, word_idx_map):
         return word_idx_map[word]
 
 
-data = pkl.load(gzip.open("pkl/data.pkl.gz", "rb"))
-emotionDict = pkl.load(gzip.open("pkl/emotion.pkl.gz", "rb"))
+data_path = Path(my_path.pkl_dir, 'data.pkl.gz')
+emotion_path = Path(my_path.pkl_dir, 'emotion.pkl.gz')
+
+data = pkl.load(gzip.open(data_path, "rb"))
+emotionDict = pkl.load(gzip.open(emotion_path, "rb"))
 print("data loaded!")
 
 train_labels = data['train']['labels']
@@ -177,7 +185,6 @@ output = concatenate([output, cnn_word_filter_neg_out, cnn_word_filter_pos_out])
 #########################################################################3333
 # output = Dense(hidden_dims, activation='relu', kernel_regularizer=keras.regularizers.l2(0.01))(output)
 output = Dropout(0.25)(output)
-
 
 # We project onto a single unit output layer, and squash it with a sigmoid:
 output = Dense(1, activation='sigmoid', kernel_regularizer=keras.regularizers.l2(0.01))(output)

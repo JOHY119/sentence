@@ -4,9 +4,9 @@ from pathlib import Path
 import numpy as np
 import pickle
 
-pklDir = Path('./pkl')
+import my_path
 
-
+pklDir = Path(my_path.pkl_dir)
 
 
 def generateParameters(negOrPos):
@@ -30,5 +30,5 @@ if __name__ == '__main__':
     negWeights = generateParameters('neg')
     posWeights = generateParameters('pos')
 
-    with gzip.open(Path(pklDir, 'emotion.pkl.gz'),'wb') as f:
+    with gzip.open(Path(pklDir, 'emotion.pkl.gz'), 'wb') as f:
         pickle.dump({'neg': negWeights, 'pos': posWeights}, f)
