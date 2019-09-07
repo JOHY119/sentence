@@ -155,8 +155,8 @@ cnn_word_filter_neg = Convolution1D(filters=neg_weights[0].shape[2],
                                     subsample_length=1,
                                     weights=neg_weights,
                                     trainable=False)(words)
-cnn_word_filter_neg = Lambda(lambda x: x / (1 + 1))(cnn_word_filter_neg)
-cnn_word_filter_neg = GlobalMaxPooling1D()(cnn_word_filter_neg)
+
+
 
 cnn_word_filter_neg_out = Dropout(0.25)(cnn_word_filter_neg)
 ##################################################3
@@ -167,8 +167,6 @@ cnn_word_filter_pos = Convolution1D(filters=pos_weights[0].shape[2],
                                     subsample_length=1,
                                     weights=pos_weights,
                                     trainable=False)(words)
-cnn_word_filter_pos = Lambda(lambda x: x / (1 + 1))(cnn_word_filter_pos)
-cnn_word_filter_pos = GlobalMaxPooling1D()(cnn_word_filter_pos)
 
 cnn_word_filter_pos_out = Dropout(0.25)(cnn_word_filter_pos)
 
