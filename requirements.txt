@@ -1,0 +1,4 @@
+jieba==0.39
+Keras==2.2.5
+tensorflow==1.14.0
+tensorflow-gpu==1.14.0
