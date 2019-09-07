@@ -151,7 +151,7 @@ output = Dropout(0.5)(output)
 cnn_word_filter_neg = Convolution1D(filters=neg_weights[0].shape[2],
                                     filter_length=1,
                                     border_mode='same',
-                                    activation='tanh',
+                                    activation=None,
                                     subsample_length=1,
                                     weights=neg_weights,
                                     trainable=False)(words)
@@ -162,7 +162,7 @@ cnn_word_filter_neg_out = Dropout(0.25)(cnn_word_filter_neg)
 cnn_word_filter_pos = Convolution1D(filters=pos_weights[0].shape[2],
                                     filter_length=1,
                                     border_mode='same',
-                                    activation='tanh',
+                                    activation=None,
                                     subsample_length=1,
                                     weights=pos_weights,
                                     trainable=False)(words)
