@@ -10,7 +10,7 @@ embeddingsPath = 'D:/Data/sentiment/embeddings/sgns.wiki.bigram-char'
 stopWordsPath = 'D:/Data/sentiment/embeddings/stop_words.txt'
 
 # Train, Dev, and Test files
-folder = 'D:/Data/sentiment/waimai/'
+folder = 'D:/Data/sentiment/shopping/'
 files = [folder + 'train.txt', folder + 'dev.txt', folder + 'test.txt']
 categories = ['neg', 'pos']
 

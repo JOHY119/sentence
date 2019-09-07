@@ -135,7 +135,7 @@ for filter_length in filter_lengths:
                                kernel_size=filter_length,
                                padding='same',
                                # activation='relu',
-                               activation='tanh',
+                               activation='relu',
                                strides=1)(words)
 
     words_conv = GlobalMaxPooling1D()(words_conv)
@@ -156,8 +156,7 @@ cnn_word_filter_neg = Convolution1D(filters=neg_weights[0].shape[2],
                                     weights=neg_weights,
                                     trainable=False)(words)
 
-
-
+cnn_word_filter_neg = GlobalMaxPooling1D()(cnn_word_filter_neg)
 cnn_word_filter_neg_out = Dropout(0.25)(cnn_word_filter_neg)
 ##################################################3
 cnn_word_filter_pos = Convolution1D(filters=pos_weights[0].shape[2],
@@ -168,14 +167,15 @@ cnn_word_filter_pos = Convolution1D(filters=pos_weights[0].shape[2],
                                     weights=pos_weights,
                                     trainable=False)(words)
 
+cnn_word_filter_pos = GlobalMaxPooling1D()(cnn_word_filter_pos)
 cnn_word_filter_pos_out = Dropout(0.25)(cnn_word_filter_pos)
 
 #######################################
 #######################################
-output=concatenate([output,cnn_word_filter_neg_out,cnn_word_filter_pos_out])
+output = concatenate([output, cnn_word_filter_neg_out, cnn_word_filter_pos_out])
 
 #########################################################################3333
-output = Dense(hidden_dims, activation='tanh', kernel_regularizer=keras.regularizers.l2(0.01))(output)
+# output = Dense(hidden_dims, activation='relu', kernel_regularizer=keras.regularizers.l2(0.01))(output)
 output = Dropout(0.25)(output)
 
 
