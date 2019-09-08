@@ -14,8 +14,8 @@ Code was tested with:
 - Keras 2.0.5
 
 Data structure:
-To run this network / to run a sentence classification using CNNs, the data must be in a certain format. 
-The list train_sentences containts the different sentences of your training data. Each word in the training data is converted to
+To run this network / to run a sentence classification using CNNs, the ShareData must be in a certain format.
+The list train_sentences containts the different sentences of your training ShareData. Each word in the training ShareData is converted to
 the according word index in the embeddings matrix. An example could look like:
 [[1,6,2,1,5,12,42],
  [7,23,56],
@@ -69,8 +69,8 @@ def wordIdxLookup(word, word_idx_map):
         return word_idx_map[word]
 
 
-data = pkl.load(gzip.open("pkl/data.pkl.gz", "rb"))
-print("data loaded!")
+data = pkl.load(gzip.open("pkl/ShareData.pkl.gz", "rb"))
+print("ShareData loaded!")
 
 train_labels = data['train']['labels']
 train_sentences = data['train']['sentences']

@@ -1,5 +1,5 @@
 """
-The file preprocesses the data/train.txt, data/dev.txt and data/test.txt from sentiment classification task (English)
+The file preprocesses the ShareData/train.txt, ShareData/dev.txt and ShareData/test.txt from sentiment classification task (English)
 
 It requires pre-trained word embeddings for English. It tries to download those from here:
 https://www.cs.york.ac.uk/nlp/extvec/
@@ -30,7 +30,7 @@ else:  # Python 2.7 imports
 embeddingsPath = 'embeddings/wiki_extvec.gz'
 
 # Train, Dev, and Test files
-folder = 'data/'
+folder = 'ShareData/'
 files = [folder + 'train.txt', folder + 'dev.txt', folder + 'test.txt']
 
 
@@ -87,7 +87,7 @@ def readFile(filepath):
 #      Start of the preprocessing
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: #
 
-outputFilePath = 'pkl/data.pkl.gz'
+outputFilePath = 'pkl/ShareData.pkl.gz'
 
 trainDataset = readFile(files[0])
 devDataset = readFile(files[1])

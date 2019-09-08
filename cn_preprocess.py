@@ -13,8 +13,8 @@ import my_path
 embeddingsPath = Path(my_path.embedding_path)
 stopWordsPath = Path(my_path.stopping_path)
 
-# outputFilePath = 'pkl/data.pkl.gz'
-outputFilePath = Path(my_path.pkl_dir, 'data.pkl.gz')
+# outputFilePath = 'pkl/ShareData.pkl.gz'
+outputFilePath = Path(my_path.pkl_dir, 'ShareData.pkl.gz')
 
 # Train, Dev, and Test files
 # folder = 'D:/Data/sentiment/shopping/'
@@ -114,7 +114,7 @@ def readFile(filepath):
 
 if __name__ == '__main__':
 
-    # outputFilePath = 'pkl/data.pkl.gz'
+    # outputFilePath = 'pkl/ShareData.pkl.gz'
 
     trainDataset = readFile(files[0])
     devDataset = readFile(files[1])
