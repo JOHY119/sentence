@@ -24,13 +24,14 @@ files = [Path(folder, 'train.txt'), Path(folder, 'dev.txt'), Path(folder, 'test.
 categories = ['neg', 'pos']
 
 
-def createMatrices(sentences, word2Idx):
+def createMatrices(sentences, word2Idx, stop_words):
     unknownIdx = word2Idx['UNKNOWN_TOKEN']
     paddingIdx = word2Idx['PADDING_TOKEN']
 
     xMatrix = []
     unknownWordCount = 0
     wordCount = 0
+    stopCount = 0
 
     for sentence in sentences:
         targetWordIdx = 0
@@ -39,6 +40,10 @@ def createMatrices(sentences, word2Idx):
 
         for word in sentence:
             wordCount += 1
+
+            if word in stop_words:
+                stopCount += 1
+                continue
 
             if word in word2Idx:
                 wordIdx = word2Idx[word]
@@ -53,6 +58,8 @@ def createMatrices(sentences, word2Idx):
         xMatrix.append(sentenceWordIdx)
 
     print("Unknown tokens: %.2f%%" % (unknownWordCount / (float(wordCount)) * 100))
+    print("Stop tokens: %.2f%%" % (stopCount / (float(wordCount)) * 100))
+
     return xMatrix
 
 
@@ -64,6 +71,16 @@ def get_words_list(sentence):
     words = list(jieba.cut(sentence))
 
     return words
+
+
+def get_stop_word_dict(path):
+    with open(path, encoding='utf-8') as f:
+        dic = {}
+        for line in f:
+            word = line.strip()
+            dic[word] = True
+        dic[' '] = True
+        return dic
 
 
 def readFile(filepath):
@@ -110,17 +127,7 @@ if __name__ == '__main__':
             for token in sentence:
                 words[token] = True
 
-    fStopWords = open(stopWordsPath, encoding='utf-8')
-    for line in fStopWords:
-        word = line.strip()
-        if word in words:
-            words.pop(word)
-
-    fStopWords.close()
-
-    if ' ' in words:
-        words.pop(' ')
-
+    stop_word_dict = get_stop_word_dict(stopWordsPath)
     # :: Read in word embeddings ::
     word2Idx = {}
     wordEmbeddings = []
@@ -155,9 +162,9 @@ if __name__ == '__main__':
     print("Len words: ", len(words))
 
     # :: Create matrices ::
-    train_matrix = createMatrices(trainDataset[0], word2Idx)
-    dev_matrix = createMatrices(devDataset[0], word2Idx)
-    test_matrix = createMatrices(testDataset[0], word2Idx)
+    train_matrix = createMatrices(trainDataset[0], word2Idx, stop_word_dict)
+    dev_matrix = createMatrices(devDataset[0], word2Idx, stop_word_dict)
+    test_matrix = createMatrices(testDataset[0], word2Idx, stop_word_dict)
 
     data = {
         'wordEmbeddings': wordEmbeddings, 'word2Idx': word2Idx,
