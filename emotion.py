@@ -14,7 +14,7 @@ data_dir = Path(my_path.data_dir)
 pkl_dir = Path(my_path.pkl_dir)
 embedding_dir = Path(my_path.embedding_dir)
 
-embedding = Path(embedding_dir)
+embedding = Path(my_path.embedding_path)
 e_list_path = Path(my_path.e_list_path)
 
 # 需生成的情感词数量 neg pos数量相同

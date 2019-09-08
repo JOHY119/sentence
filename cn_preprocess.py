@@ -10,8 +10,8 @@ import numpy as np
 
 import my_path
 
-embeddingsPath = Path(my_path.embedding_dir)
-stopWordsPath = Path(my_path.stopping_dir)
+embeddingsPath = Path(my_path.embedding_path)
+stopWordsPath = Path(my_path.stopping_path)
 
 # outputFilePath = 'pkl/data.pkl.gz'
 outputFilePath = Path(my_path.pkl_dir, 'data.pkl.gz')
