@@ -69,7 +69,7 @@ def wordIdxLookup(word, word_idx_map):
         return word_idx_map[word]
 
 
-data = pkl.load(gzip.open("pkl/ShareData.pkl.gz", "rb"))
+data = pkl.load(gzip.open("pkl/data.pkl.gz", "rb"))
 print("ShareData loaded!")
 
 train_labels = data['train']['labels']

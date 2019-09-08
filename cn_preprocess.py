@@ -14,7 +14,7 @@ embeddingsPath = Path(my_path.embedding_path)
 stopWordsPath = Path(my_path.stopping_path)
 
 # outputFilePath = 'pkl/ShareData.pkl.gz'
-outputFilePath = Path(my_path.pkl_dir, 'ShareData.pkl.gz')
+outputFilePath = Path(my_path.pkl_dir, 'data.pkl.gz')
 
 # Train, Dev, and Test files
 # folder = 'D:/Data/sentiment/shopping/'

@@ -74,7 +74,7 @@ def wordIdxLookup(word, word_idx_map):
         return word_idx_map[word]
 
 
-data_path = Path(my_path.pkl_dir, 'ShareData.pkl.gz')
+data_path = Path(my_path.pkl_dir, 'data.pkl.gz')
 emotion_path = Path(my_path.pkl_dir, 'emotion.pkl.gz')
 
 data = pkl.load(gzip.open(data_path, "rb"))
@@ -119,10 +119,10 @@ print('X_test shape:', X_test.shape)
 print('Build model...')
 
 # set parameters:
-batch_size = 50
+batch_size = 300
 
-nb_filter = 50
-filter_lengths = [1, 2, 3]
+nb_filter = 256
+filter_lengths = [1, 3, 5]
 hidden_dims = 100
 nb_epoch = 15
 
@@ -142,51 +142,54 @@ for filter_length in filter_lengths:
     words_conv = Convolution1D(filters=nb_filter,
                                kernel_size=filter_length,
                                padding='same',
-                               activation='relu',
+                               activation='tanh',
                                strides=1)(words)
 
     words_conv = GlobalMaxPooling1D()(words_conv)
+    # words_conv = Dropout(0.25)(words_conv)
 
     words_convolutions.append(words_conv)
 
 output = concatenate(words_convolutions)
 
 # We add a vanilla hidden layer together with dropout layers:
-output = Dropout(0.25)(output)
+# output = Dropout(0.25)(output)
 
 #########################################################################3
-cnn_word_filter_neg = Convolution1D(filters=neg_weights[0].shape[2],
-                                    filter_length=1,
-                                    border_mode='same',
-                                    activation='tanh',
-                                    subsample_length=1,
-                                    weights=neg_weights,
-                                    trainable=False)(words)
+cnn_word_filter_neg_out = Convolution1D(filters=neg_weights[0].shape[2],
+                                        filter_length=1,
+                                        border_mode='same',
+                                        activation='tanh',
+                                        subsample_length=1,
+                                        weights=neg_weights,
+                                        trainable=False)(words)
 
-cnn_word_filter_neg = GlobalMaxPooling1D()(cnn_word_filter_neg)
-cnn_word_filter_neg_out = Dropout(0.25)(cnn_word_filter_neg)
+cnn_word_filter_neg_out = GlobalMaxPooling1D()(cnn_word_filter_neg_out)
+cnn_word_filter_neg_out = Dropout(0.25)(cnn_word_filter_neg_out)
 ##################################################3
-cnn_word_filter_pos = Convolution1D(filters=pos_weights[0].shape[2],
-                                    filter_length=1,
-                                    border_mode='same',
-                                    activation='tanh',
-                                    subsample_length=1,
-                                    weights=pos_weights,
-                                    trainable=False)(words)
+cnn_word_filter_pos_out = Convolution1D(filters=pos_weights[0].shape[2],
+                                        filter_length=1,
+                                        border_mode='same',
+                                        activation='tanh',
+                                        subsample_length=1,
+                                        weights=pos_weights,
+                                        trainable=False)(words)
 
-cnn_word_filter_pos = GlobalMaxPooling1D()(cnn_word_filter_pos)
-cnn_word_filter_pos_out = Dropout(0.25)(cnn_word_filter_pos)
+cnn_word_filter_pos_out = GlobalMaxPooling1D()(cnn_word_filter_pos_out)
+cnn_word_filter_pos_out = Dropout(0.25)(cnn_word_filter_pos_out)
 
 #######################################
 #######################################
 output = concatenate([output, cnn_word_filter_neg_out, cnn_word_filter_pos_out])
 
 #########################################################################3333
-# output = Dense(hidden_dims, activation='relu', kernel_regularizer=keras.regularizers.l2(0.01))(output)
+output = Dense(hidden_dims, activation='tanh', kernel_regularizer=keras.regularizers.l2(0.01))(output)
+# output = GlobalMaxPooling1D()(output)
 output = Dropout(0.25)(output)
 
 # We project onto a single unit output layer, and squash it with a sigmoid:
 output = Dense(1, activation='sigmoid', kernel_regularizer=keras.regularizers.l2(0.01))(output)
+# output = Dense(1, activation='sigmoid')(output)
 
 model = Model(inputs=[words_input], outputs=[output])
 model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])

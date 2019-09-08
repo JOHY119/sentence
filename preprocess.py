@@ -87,7 +87,7 @@ def readFile(filepath):
 #      Start of the preprocessing
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: #
 
-outputFilePath = 'pkl/ShareData.pkl.gz'
+outputFilePath = 'pkl/data.pkl.gz'
 
 trainDataset = readFile(files[0])
 devDataset = readFile(files[1])
