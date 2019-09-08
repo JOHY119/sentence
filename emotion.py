@@ -18,7 +18,7 @@ embedding = Path(my_path.embedding_path)
 e_list_path = Path(my_path.e_list_path)
 
 # 需生成的情感词数量 neg pos数量相同
-nb_words = 256
+nb_words = 50
 
 
 def get_embedding_dict(path):

@@ -121,7 +121,7 @@ print('Build model...')
 # set parameters:
 batch_size = 300
 
-nb_filter = 256
+nb_filter = 50
 filter_lengths = [1, 3, 5]
 hidden_dims = 100
 nb_epoch = 15
@@ -153,7 +153,7 @@ for filter_length in filter_lengths:
 output = concatenate(words_convolutions)
 
 # We add a vanilla hidden layer together with dropout layers:
-# output = Dropout(0.25)(output)
+output = Dropout(0.25)(output)
 
 #########################################################################3
 cnn_word_filter_neg_out = Convolution1D(filters=neg_weights[0].shape[2],
