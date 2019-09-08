@@ -10,10 +10,8 @@ import numpy as np
 
 import my_path
 
-# embeddingsPath = 'D:/Data/sentiment/embeddings/sgns.wiki.bigram-char'
-# stopWordsPath = 'D:/Data/sentiment/embeddings/stop_words.txt'
-embeddingsPath = Path(my_path.embedding_dir, 'sgns.wiki.bigram-char')
-stopWordsPath = Path(my_path.embedding_dir, 'stop_words.txt')
+embeddingsPath = Path(my_path.embedding_dir)
+stopWordsPath = Path(my_path.stopping_dir)
 
 # outputFilePath = 'pkl/data.pkl.gz'
 outputFilePath = Path(my_path.pkl_dir, 'data.pkl.gz')

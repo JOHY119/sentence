@@ -14,8 +14,8 @@ data_dir = Path(my_path.data_dir)
 pkl_dir = Path(my_path.pkl_dir)
 embedding_dir = Path(my_path.embedding_dir)
 
-embedding = Path(embedding_dir, 'sgns.wiki.bigram-char')
-e_list_path = Path(data_dir, 'BosonNLP_sentiment_score.txt')
+embedding = Path(embedding_dir)
+e_list_path = Path(my_path.e_list_path)
 
 # 需生成的情感词数量 neg pos数量相同
 nb_words = 2048
