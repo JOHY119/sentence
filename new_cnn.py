@@ -124,7 +124,7 @@ batch_size = 50
 nb_filter = 50
 filter_lengths = [1, 2, 3]
 hidden_dims = 100
-nb_epoch = 10
+nb_epoch = 15
 
 words_input = Input(shape=(max_sentence_len,), dtype='int32', name='words_input')
 
@@ -142,7 +142,6 @@ for filter_length in filter_lengths:
     words_conv = Convolution1D(filters=nb_filter,
                                kernel_size=filter_length,
                                padding='same',
-                               # activation='relu',
                                activation='relu',
                                strides=1)(words)
 
@@ -153,13 +152,13 @@ for filter_length in filter_lengths:
 output = concatenate(words_convolutions)
 
 # We add a vanilla hidden layer together with dropout layers:
-output = Dropout(0.5)(output)
+output = Dropout(0.25)(output)
 
 #########################################################################3
 cnn_word_filter_neg = Convolution1D(filters=neg_weights[0].shape[2],
                                     filter_length=1,
                                     border_mode='same',
-                                    activation=None,
+                                    activation='tanh',
                                     subsample_length=1,
                                     weights=neg_weights,
                                     trainable=False)(words)
@@ -170,7 +169,7 @@ cnn_word_filter_neg_out = Dropout(0.25)(cnn_word_filter_neg)
 cnn_word_filter_pos = Convolution1D(filters=pos_weights[0].shape[2],
                                     filter_length=1,
                                     border_mode='same',
-                                    activation=None,
+                                    activation='tanh',
                                     subsample_length=1,
                                     weights=pos_weights,
                                     trainable=False)(words)
