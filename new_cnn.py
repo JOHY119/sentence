@@ -239,14 +239,44 @@ def my_plot(data_list, title, label_list, position):
     plt.xlabel(label_list[0])
     plt.legend(['Train', 'Test'], loc='upper left')
 
-my_plot([history.history['acc'],history.history['val_acc']],'Model accuracy',['Epoch','Accuracy'],321)
-my_plot([history.history['loss'],history.history['val_loss']],'Model loss',['Epoch','loss'],322)
-my_plot([history.history['F1'],history.history['val_F1']],'Model F1',['Epoch','F1'],323)
-my_plot([history.history['Recall'],history.history['val_Recall']],'ModelRecall',['Epoch','Recall'],323)
-my_plot([history.history['Precision'],history.history['val_Precision']],'Model Precision',['Epoch','Precision'],324)
 
+mean_acc = np.mean(history.history['acc'])
+mean_val_acc = np.mean(history.history['val_acc'])
 
-plt.subplot(325)
+mean_loss = np.mean(history.history['acc'])
+mean_val_loss = np.mean(history.history['val_acc'])
+
+mean_F1 = np.mean(history.history['F1'])
+mean_val_F1 = np.mean(history.history['val_F1'])
+
+mean_Recall = np.mean(history.history['Recall'])
+mean_val_Recall = np.mean(history.history['val_Recall'])
+
+mean_Precision = np.mean(history.history['Precision'])
+mean_val_Precision = np.mean(history.history['val_Precision'])
+
+mean_score = np.mean(roc_list)
+
+print('mean_acc:', mean_acc)
+print('mean_val_acc: ', mean_val_acc)
+print('mean_loss:', mean_loss)
+print('mean_val_loss:', mean_val_loss)
+print('mean_F1:', mean_F1)
+print('mean_val_F1:', mean_val_F1)
+print('mean_Recall:', mean_Recall)
+print('mean_val_Recall:', mean_val_Recall)
+print('mean_Precision:', mean_Precision)
+print('mean_val_Precision:', mean_val_Precision)
+print('mean_score:', mean_score)
+
+my_plot([history.history['acc'], history.history['val_acc']], 'Model accuracy', ['Epoch', 'Accuracy'], 321)
+my_plot([history.history['loss'], history.history['val_loss']], 'Model loss', ['Epoch', 'loss'], 322)
+my_plot([history.history['F1'], history.history['val_F1']], 'Model F1', ['Epoch', 'F1'], 323)
+my_plot([history.history['Recall'], history.history['val_Recall']], 'ModelRecall', ['Epoch', 'Recall'], 324)
+my_plot([history.history['Precision'], history.history['val_Precision']], 'Model Precision', ['Epoch', 'Precision'],
+        325)
+
+plt.subplot(326)
 plt.plot(roc_list)
 plt.title('ROC_AUC')
 plt.ylabel('ROC_AUC')
