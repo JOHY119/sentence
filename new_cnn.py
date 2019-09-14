@@ -51,6 +51,10 @@ import numpy as np
 import my_path
 import matplotlib.pyplot as plt
 
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import roc_auc_score
+from keras.callbacks import Callback
+
 np.random.seed(1337)  # for reproducibility
 
 import gzip
@@ -74,6 +78,19 @@ from keras.preprocessing import sequence
 def wordIdxLookup(word, word_idx_map):
     if word in word_idx_map:
         return word_idx_map[word]
+
+
+class RocAucEvaluation(Callback):
+    def __init__(self, validation_data=(), interval=1):
+        super(Callback, self).__init__()
+        self.interval = interval
+        self.x_val, self.y_val = validation_data
+
+    def on_epoch_end(self, epoch, log={}):
+        if epoch % self.interval == 0:
+            y_pred = self.model.predict(self.x_val, verbose=0)
+            score = roc_auc_score(self.y_val, y_pred)
+            print('\n ROC_AUC - epoch:%d - score:%.6f \n' % (epoch + 1, score))
 
 
 data_path = Path(my_path.pkl_dir, 'data.pkl.gz')
@@ -121,12 +138,12 @@ print('X_test shape:', X_test.shape)
 print('Build model...')
 
 # set parameters:
-batch_size = 300
+batch_size = 50
 
 nb_filter = 50
-filter_lengths = [1, 2, 3, 4, 5]
-hidden_dims = 100
-nb_epoch = 15
+filter_lengths = [1, 3,  5]
+hidden_dims = 16
+nb_epoch = 50
 
 words_input = Input(shape=(max_sentence_len,), dtype='int32', name='words_input')
 
@@ -155,42 +172,42 @@ for filter_length in filter_lengths:
 output = concatenate(words_convolutions)
 
 # We add a vanilla hidden layer together with dropout layers:
-output = Dropout(0.25)(output)
+output = Dropout(0.5)(output)
 
 #########################################################################3
 cnn_word_filter_neg_out = Convolution1D(filters=neg_weights[0].shape[2],
                                         filter_length=1,
                                         border_mode='same',
-                                        activation='tanh',
-                                        subsample_length=1,
+                                        # activation='tanh',
+                                        # subsample_length=1,
                                         weights=neg_weights,
                                         trainable=False)(words)
 
 cnn_word_filter_neg_out = GlobalMaxPooling1D()(cnn_word_filter_neg_out)
-cnn_word_filter_neg_out = Dropout(0.25)(cnn_word_filter_neg_out)
+cnn_word_filter_neg_out = Dropout(0.5)(cnn_word_filter_neg_out)
 ##################################################3
 cnn_word_filter_pos_out = Convolution1D(filters=pos_weights[0].shape[2],
                                         filter_length=1,
                                         border_mode='same',
                                         activation='tanh',
-                                        subsample_length=1,
-                                        weights=pos_weights,
+                                        # subsample_length=1,
+                                        # weights=pos_weights,
                                         trainable=False)(words)
 
 cnn_word_filter_pos_out = GlobalMaxPooling1D()(cnn_word_filter_pos_out)
-cnn_word_filter_pos_out = Dropout(0.25)(cnn_word_filter_pos_out)
+cnn_word_filter_pos_out = Dropout(0.5)(cnn_word_filter_pos_out)
 
 #######################################
 #######################################
 output = concatenate([output, cnn_word_filter_neg_out, cnn_word_filter_pos_out])
 
 #########################################################################3333
-output = Dense(hidden_dims, activation='tanh', kernel_regularizer=keras.regularizers.l2(0.01))(output)
+output = Dense(hidden_dims, activation='tanh', kernel_regularizer=keras.regularizers.l2(0.001))(output)
 # output = GlobalMaxPooling1D()(output)
-output = Dropout(0.25)(output)
+output = Dropout(0.5)(output)
 
 # We project onto a single unit output layer, and squash it with a sigmoid:
-output = Dense(1, activation='sigmoid', kernel_regularizer=keras.regularizers.l2(0.01))(output)
+output = Dense(1, activation='sigmoid')(output)
 # output = Dense(1, activation='sigmoid')(output)
 
 model = Model(inputs=[words_input], outputs=[output])
@@ -199,7 +216,13 @@ model.compile(loss='binary_crossentropy', optimizer='adam',
 
 model.summary()
 
-history = model.fit(X_train, y_train, batch_size=batch_size, epochs=15, validation_data=[X_dev, y_dev])
+# RocAuc = RocAucEvaluation(validation_data=(X_dev,y_dev), interval=1)
+# history = model.fit(X_train, y_train, batch_size=batch_size, epochs=15, validation_data=[X_dev, y_dev],callbacks=[RocAuc], verbose=2)
+
+x_train, y_train, x_label, y_label = train_test_split(X_train, y_train, train_size=0.95, random_state=233)
+RocAuc = RocAucEvaluation(validation_data=(y_train, y_label), interval=1)
+history = model.fit(x_train, x_label, batch_size=batch_size, epochs=nb_epoch, validation_data=[y_train, y_label],
+                    callbacks=[RocAuc])
 
 plt.plot(history.history['acc'])
 plt.plot(history.history['val_acc'])
