@@ -210,6 +210,7 @@ output = Dropout(0.5)(output)
 output = Dense(1, activation='sigmoid')(output)
 # output = Dense(1, activation='sigmoid')(output)
 
+
 model = Model(inputs=[words_input], outputs=[output])
 model.compile(loss='binary_crossentropy', optimizer='adam',
               metrics=['acc', evaluation.F1, evaluation.Recall, evaluation.Precision])
