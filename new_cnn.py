@@ -122,7 +122,7 @@ print('Build model...')
 batch_size = 300
 
 nb_filter = 50
-filter_lengths = [1, 3, 5]
+filter_lengths = [1, 2, 3, 4, 5]
 hidden_dims = 100
 nb_epoch = 15
 
