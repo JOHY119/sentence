@@ -18,7 +18,7 @@ embedding = Path(my_path.embedding_path)
 e_list_path = Path(my_path.e_list_path)
 
 # 需生成的情感词数量 neg pos数量相同
-nb_words = 50
+nb_words = 256
 
 
 def get_embedding_dict(path):
@@ -73,13 +73,14 @@ def find_words(embedding_dict, emotion_list: list, neg_or_pos, n=2048):
     return word_list
 
 
-def generateParameters(words):
+def generateParameters(words,delta):
     # path = Path(pklDir, negOrPos + '.pkl')
     # with open(path, 'rb') as pkl:
     #     words = pickle.load(pkl)
 
     embeddings = [l[2] for l in words]
     weights = np.array(embeddings)
+    weights=(delta/weights)/300
     weights = weights.T
     word_filter_weights = np.expand_dims(weights, axis=0)
 
@@ -97,8 +98,8 @@ if __name__ == '__main__':
     neg_list = find_words(embedding_dict, word_list, 'neg', nb_words)
     pos_list = find_words(embedding_dict, word_list, 'pos', nb_words)
 
-    negWeights = generateParameters(neg_list)
-    posWeights = generateParameters(pos_list)
+    negWeights = generateParameters(neg_list,-1)
+    posWeights = generateParameters(pos_list,1)
 
     print('neg shape: ' + str(negWeights[0].shape))
     print('pos shape: ' + str(posWeights[0].shape))

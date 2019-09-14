@@ -61,6 +61,7 @@ else:  # Python 2.7 imports
     import cPickle as pkl
 
 import keras
+import evaluation
 from keras.models import Model
 from keras.layers import Input, Dense, Dropout, Activation, Flatten, concatenate, Lambda
 from keras.layers import Embedding
@@ -192,7 +193,7 @@ output = Dense(1, activation='sigmoid', kernel_regularizer=keras.regularizers.l2
 # output = Dense(1, activation='sigmoid')(output)
 
 model = Model(inputs=[words_input], outputs=[output])
-model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['acc',evaluation.F1,evaluation.Recall,evaluation.Precision])
 
 model.summary()
 
@@ -201,8 +202,8 @@ for epoch in range(nb_epoch):
     model.fit(X_train, y_train, batch_size=batch_size, epochs=1)
 
     # Use Keras to compute the loss and the accuracy
-    dev_loss, dev_accuracy = model.evaluate(X_dev, y_dev, verbose=False)
-    test_loss, test_accuracy = model.evaluate(X_test, y_test, verbose=False)
+    dev_loss, dev_accuracy,f1,re,pre = model.evaluate(X_dev, y_dev, verbose=False)
+    test_loss, test_accuracy,f1,re,pre = model.evaluate(X_test, y_test, verbose=False)
 
     print("Dev-Accuracy: %.2f%% (loss: %.4f)" % (dev_accuracy * 100, dev_loss))
     print("Test-Accuracy: %.2f%% (loss: %.4f)" % (test_accuracy * 100, test_loss))
