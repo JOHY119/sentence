@@ -126,7 +126,7 @@ batch_size = 300
 nb_filter = 50
 filter_lengths = [1, 2, 3, 4, 5]
 hidden_dims = 100
-nb_epoch = 15
+nb_epoch = 30
 
 words_input = Input(shape=(max_sentence_len,), dtype='int32', name='words_input')
 
@@ -200,7 +200,7 @@ model.compile(loss='binary_crossentropy', optimizer='adam',
 
 model.summary()
 
-history = model.fit(X_train, y_train, batch_size=batch_size, epochs=15, validation_data=[X_dev, y_dev])
+history = model.fit(X_train, y_train, batch_size=batch_size, epochs=30, validation_data=[X_dev, y_dev])
 
 plt.plot(history.history['acc'])
 plt.plot(history.history['val_acc'])
