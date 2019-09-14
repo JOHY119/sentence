@@ -193,6 +193,7 @@ output = Dropout(0.25)(output)
 output = Dense(1, activation='sigmoid', kernel_regularizer=keras.regularizers.l2(0.01))(output)
 # output = Dense(1, activation='sigmoid')(output)
 
+
 model = Model(inputs=[words_input], outputs=[output])
 model.compile(loss='binary_crossentropy', optimizer='adam',
               metrics=['acc', evaluation.F1, evaluation.Recall, evaluation.Precision])
