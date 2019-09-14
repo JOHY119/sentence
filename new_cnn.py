@@ -49,6 +49,7 @@ from pathlib import Path
 import numpy as np
 
 import my_path
+import matplotlib.pyplot as plt
 
 np.random.seed(1337)  # for reproducibility
 
@@ -193,17 +194,37 @@ output = Dense(1, activation='sigmoid', kernel_regularizer=keras.regularizers.l2
 # output = Dense(1, activation='sigmoid')(output)
 
 model = Model(inputs=[words_input], outputs=[output])
-model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['acc',evaluation.F1,evaluation.Recall,evaluation.Precision])
+model.compile(loss='binary_crossentropy', optimizer='adam',
+              metrics=['acc', evaluation.F1, evaluation.Recall, evaluation.Precision])
 
 model.summary()
 
-for epoch in range(nb_epoch):
-    print("\n------------- Epoch %d ------------" % (epoch + 1))
-    model.fit(X_train, y_train, batch_size=batch_size, epochs=1)
+history = model.fit(X_train, y_train, batch_size=batch_size, epochs=15, validation_data=[X_dev, y_dev])
 
-    # Use Keras to compute the loss and the accuracy
-    dev_loss, dev_accuracy,f1,re,pre = model.evaluate(X_dev, y_dev, verbose=False)
-    test_loss, test_accuracy,f1,re,pre = model.evaluate(X_test, y_test, verbose=False)
+plt.plot(history.history['acc'])
+plt.plot(history.history['val_acc'])
+plt.title('Model accuracy')
+plt.ylabel('Accuracy')
+plt.xlabel('Epoch')
+plt.legend(['Train', 'Test'], loc='upper left')
+plt.show()
 
-    print("Dev-Accuracy: %.2f%% (loss: %.4f)" % (dev_accuracy * 100, dev_loss))
-    print("Test-Accuracy: %.2f%% (loss: %.4f)" % (test_accuracy * 100, test_loss))
+# 绘制训练 & 验证的损失值
+plt.plot(history.history['loss'])
+plt.plot(history.history['val_loss'])
+plt.title('Model loss')
+plt.ylabel('Loss')
+plt.xlabel('Epoch')
+plt.legend(['Train', 'Test'], loc='upper left')
+plt.show()
+# print(history)
+# for epoch in range(nb_epoch):
+#     print("\n------------- Epoch %d ------------" % (epoch + 1))
+#     model.fit(X_train, y_train, batch_size=batch_size, epochs=1)
+#
+#     # Use Keras to compute the loss and the accuracy
+#     dev_loss, dev_accuracy, f1, re, pre = model.evaluate(X_dev, y_dev, verbose=False)
+#     test_loss, test_accuracy, f1, re, pre = model.evaluate(X_test, y_test, verbose=False)
+#
+#     print("Dev-Accuracy: %.2f%% (loss: %.4f)" % (dev_accuracy * 100, dev_loss))
+#     print("Test-Accuracy: %.2f%% (loss: %.4f)" % (test_accuracy * 100, test_loss))
