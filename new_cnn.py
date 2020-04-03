@@ -1,47 +1,4 @@
-"""
-This implementation is a Convolutional Neural Network for sentence classification.
 
-It uses the same preprocessing of Kim et al., EMNLP 2014, 'Convolutional Neural Networks for Sentence Classification ' (https://github.com/yoonkim/CNN_sentence).
-
-Run the code:
-1) Run 'python preprocess.py'. This will preprocess.py the dataset and create the necessary pickle files in the pkl/ folder.
-2) Run this code via: python cnn.py
-
-
-Code was tested with:
-- Python 2.7 & Python 3.6
-- Theano 0.9.0 & TensorFlow 1.2.1
-- Keras 2.0.5
-
-Data structure:
-To run this network / to run a sentence classification using CNNs, the ShareData must be in a certain format.
-The list train_sentences containts the different sentences of your training ShareData. Each word in the training ShareData is converted to
-the according word index in the embeddings matrix. An example could look like:
-[[1,6,2,1,5,12,42],
- [7,23,56],
- [35,76,23,64,17,97,43,62,47,65]]
-
-Here we have three sentences, the first with 7 words, the second with 3 words and the third with 10 words.
-As our network expects a matrix as input for the mini-batchs, we need to bring all sentences to the same length. This is a requirement
-of Theano to run efficiently.  For this we use the function 'sequence.pad_sequences', which adds 0-padding to the matrix. The list/matrix will look after the padding like this:
-[[0,0,0,1,6,2,1,5,12,42],
- [0,0,0,0,0,0,0,7,23,56],
- [35,76,23,64,17,97,43,62,47,65]]
-
-To make sure that the network does not interpret 0 as some word, we set the embeddings matrix (word_embeddings) such that the 0-column only contains 0. You can check this by outputting word_embeddings[0].
-
-
-Our labels (y_train) are a 1-dimensional vector containing the binary label for out sentiment classification example.
-
-This code uses the functional API of Keras: https://keras.io/getting-started/functional-api-guide/
-
-It implements roughly the network proposed by Kim et al., Convolutional Neural Networks for Sentence Classification, using convolutions
-with several filter lengths.
-
-Performance after 5 epochs:
-Dev-Accuracy: 79.09% (loss: 0.5046)
-Test-Accuracy: 77.44% (loss: 0.5163)
-"""
 from __future__ import print_function
 
 from pathlib import Path
@@ -80,7 +37,6 @@ roc_list = []
 def wordIdxLookup(word, word_idx_map):
     if word in word_idx_map:
         return word_idx_map[word]
-
 
 class RocAucEvaluation(Callback):
     def __init__(self, validation_data=(), interval=1):
@@ -141,12 +97,13 @@ print('X_test shape:', X_test.shape)
 print('Build model...')
 
 # set parameters:
-batch_size = 50
+batch_size = 300
 
 nb_filter = 50
 filter_lengths = [1, 3, 5]
-hidden_dims = 16
-nb_epoch = 15
+hidden_dims = 100
+atten_dims = 100
+nb_epoch = 150
 
 words_input = Input(shape=(max_sentence_len,), dtype='int32', name='words_input')
 
@@ -160,24 +117,24 @@ words = wordsEmbeddingLayer(words_input)
 
 # Now we add a variable number of convolutions
 words_convolutions = []
+# cnn_word_filter_attention_out = []
 for filter_length in filter_lengths:
     words_conv = Convolution1D(filters=nb_filter,
                                kernel_size=filter_length,
                                padding='same',
                                activation='tanh',
                                strides=1)(words)
-
     words_conv = GlobalMaxPooling1D()(words_conv)
-    # words_conv = Dropout(0.25)(words_conv)
-
     words_convolutions.append(words_conv)
 
 output = concatenate(words_convolutions)
 
+
 # We add a vanilla hidden layer together with dropout layers:
 output = Dropout(0.5)(output)
 
-#########################################################################3
+#########################################################################
+#########          消极词
 cnn_word_filter_neg_out = Convolution1D(filters=neg_weights[0].shape[2],
                                         filter_length=1,
                                         border_mode='same',
@@ -189,7 +146,9 @@ cnn_word_filter_neg_out = Convolution1D(filters=neg_weights[0].shape[2],
 cnn_word_filter_neg_out = Lambda(lambda x: (-1) * x)(cnn_word_filter_neg_out)
 cnn_word_filter_neg_out = GlobalMaxPooling1D()(cnn_word_filter_neg_out)
 cnn_word_filter_neg_out = Dropout(0.5)(cnn_word_filter_neg_out)
-##################################################3
+
+##########################################################################
+#########          积极词
 cnn_word_filter_pos_out = Convolution1D(filters=pos_weights[0].shape[2],
                                         filter_length=1,
                                         border_mode='same',
@@ -201,12 +160,12 @@ cnn_word_filter_pos_out = Convolution1D(filters=pos_weights[0].shape[2],
 cnn_word_filter_pos_out = GlobalMaxPooling1D()(cnn_word_filter_pos_out)
 cnn_word_filter_pos_out = Dropout(0.5)(cnn_word_filter_pos_out)
 
-#######################################
+
 #######################################
 output = concatenate([output, cnn_word_filter_neg_out, cnn_word_filter_pos_out])
 
 #########################################################################3333
-output = Dense(hidden_dims, activation='tanh', kernel_regularizer=keras.regularizers.l2(0.001))(output)
+output = Dense(hidden_dims, activation='tanh', kernel_regularizer=keras.regularizers.l1_l2(0.001))(output)
 # output = GlobalMaxPooling1D()(output)
 output = Dropout(0.5)(output)
 
@@ -226,7 +185,7 @@ model.summary()
 
 x_train, y_train, x_label, y_label = train_test_split(X_train, y_train, train_size=0.95, random_state=233)
 RocAuc = RocAucEvaluation(validation_data=(y_train, y_label), interval=1)
-history = model.fit(x_train, x_label, batch_size=batch_size, epochs=nb_epoch, validation_data=[y_train, y_label],
+history = model.fit(x_train, x_label, batch_size=batch_size, epochs=nb_epoch, validation_data=[y_train, y_label],shuffle=True,
                     callbacks=[RocAuc])
 
 
