@@ -2,7 +2,6 @@ import tensorflow as tf
 
 def attention(inputs, attention_size, time_major=False, return_alphas=False):
 
-
     if isinstance(inputs, tuple):
         # In case of Bi-RNN, concatenate the forward and the backward RNN outputs.
         inputs = tf.concat(inputs, 2)
