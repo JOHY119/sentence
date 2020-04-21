@@ -19,9 +19,10 @@ outputFilePath = Path(my_path.pkl_dir, 'data.pkl.gz')
 # Train, Dev, and Test files
 # folder = 'D:/Data/sentiment/shopping/'
 folder = Path(my_path.data_dir)
-files = [Path(folder, 'train.txt'), Path(folder, 'dev.txt'), Path(folder, 'test.txt')]
+files = [Path(folder, 'cnews.train.txt'), Path(folder, 'cnews.dev.txt'), Path(folder, 'cnews.test.txt')]
 # files = [folder + 'train.txt', folder + 'dev.txt', folder + 'test.txt']
-categories = ['neg', 'pos']
+# categories = ['neg', 'pos']
+categories = ['体育','娱乐','家居','房产','教育','时尚','时政','游戏','科技','财经']
 
 
 def createMatrices(sentences, word2Idx, stop_words):

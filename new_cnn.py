@@ -72,7 +72,7 @@ word_embeddings = data['wordEmbeddings']
 
 neg_weights = emotionDict['neg']
 pos_weights = emotionDict['pos']
-n_out = 2
+n_out = 10
 # :: Find the longest sentence in our dataset ::
 max_sentence_len = 0
 for sentence in train_sentences + dev_sentences + test_sentences:
@@ -97,13 +97,13 @@ print('X_test shape:', X_test.shape)
 print('Build model...')
 
 # set parameters:
-batch_size = 300
+batch_size = 100
 
 nb_filter = 50
 filter_lengths = [1, 3, 5]
 hidden_dims = 100
 atten_dims = 100
-nb_epoch = 150
+nb_epoch = 15
 
 words_input = Input(shape=(max_sentence_len,), dtype='int32', name='words_input')
 
@@ -124,7 +124,7 @@ for filter_length in filter_lengths:
                                padding='same',
                                activation='tanh',
                                strides=1)(words)
-    words_conv = GlobalMaxPooling1D()(words_conv)
+    # words_conv = GlobalMaxPooling1D()(words_conv)
     words_convolutions.append(words_conv)
 
 output = concatenate(words_convolutions)
@@ -135,42 +135,43 @@ output = Dropout(0.5)(output)
 
 #########################################################################
 #########          消极词
-cnn_word_filter_neg_out = Convolution1D(filters=neg_weights[0].shape[2],
-                                        filter_length=1,
-                                        border_mode='same',
-                                        # activation='tanh',
-                                        # subsample_length=1,
-                                        weights=neg_weights,
-                                        trainable=False)(words)
-
-cnn_word_filter_neg_out = Lambda(lambda x: (-1) * x)(cnn_word_filter_neg_out)
-cnn_word_filter_neg_out = GlobalMaxPooling1D()(cnn_word_filter_neg_out)
-cnn_word_filter_neg_out = Dropout(0.5)(cnn_word_filter_neg_out)
-
-##########################################################################
-#########          积极词
-cnn_word_filter_pos_out = Convolution1D(filters=pos_weights[0].shape[2],
-                                        filter_length=1,
-                                        border_mode='same',
-                                        # activation='tanh',
-                                        # subsample_length=1,
-                                        weights=pos_weights,
-                                        trainable=False)(words)
-
-cnn_word_filter_pos_out = GlobalMaxPooling1D()(cnn_word_filter_pos_out)
-cnn_word_filter_pos_out = Dropout(0.5)(cnn_word_filter_pos_out)
+# cnn_word_filter_neg_out = Convolution1D(filters=neg_weights[0].shape[2],
+#                                         filter_length=1,
+#                                         border_mode='same',
+#                                         # activation='tanh',
+#                                         # subsample_length=1,
+#                                         weights=neg_weights,
+#                                         trainable=False)(words)
+#
+# cnn_word_filter_neg_out = Lambda(lambda x: (-1) * x)(cnn_word_filter_neg_out)
+# cnn_word_filter_neg_out = GlobalMaxPooling1D()(cnn_word_filter_neg_out)
+# cnn_word_filter_neg_out = Dropout(0.5)(cnn_word_filter_neg_out)
+#
+# ##########################################################################
+# #########          积极词
+# cnn_word_filter_pos_out = Convolution1D(filters=pos_weights[0].shape[2],
+#                                         filter_length=1,
+#                                         border_mode='same',
+#                                         # activation='tanh',
+#                                         # subsample_length=1,
+#                                         weights=pos_weights,
+#                                         trainable=False)(words)
+#
+# cnn_word_filter_pos_out = GlobalMaxPooling1D()(cnn_word_filter_pos_out)
+# cnn_word_filter_pos_out = Dropout(0.5)(cnn_word_filter_pos_out)
 
 
 #######################################
-output = concatenate([output, cnn_word_filter_neg_out, cnn_word_filter_pos_out])
+# output = concatenate([output, cnn_word_filter_neg_out, cnn_word_filter_pos_out])
 
 #########################################################################3333
 output = Dense(hidden_dims, activation='tanh', kernel_regularizer=keras.regularizers.l1_l2(0.001))(output)
-# output = GlobalMaxPooling1D()(output)
+output = GlobalMaxPooling1D()(output)
 output = Dropout(0.5)(output)
 
 # We project onto a single unit output layer, and squash it with a sigmoid:
-output = Dense(1, activation='sigmoid')(output)
+# output = Dense(1, activation='sigmoid')(output)
+output = Dense(1, activation='softmax')(output)
 # output = Dense(1, activation='sigmoid')(output)
 
 
@@ -184,9 +185,9 @@ model.summary()
 # history = model.fit(X_train, y_train, batch_size=batch_size, epochs=15, validation_data=[X_dev, y_dev],callbacks=[RocAuc], verbose=2)
 
 x_train, y_train, x_label, y_label = train_test_split(X_train, y_train, train_size=0.95, random_state=233)
-RocAuc = RocAucEvaluation(validation_data=(y_train, y_label), interval=1)
+# RocAuc = RocAucEvaluation(validation_data=(y_train, y_label), interval=1)
 history = model.fit(x_train, x_label, batch_size=batch_size, epochs=nb_epoch, validation_data=[y_train, y_label],shuffle=True,
-                    callbacks=[RocAuc])
+                    )
 
 
 def my_plot(data_list, title, label_list, position):
@@ -237,9 +238,9 @@ my_plot([history.history['Precision'], history.history['val_Precision']], 'Model
 
 plt.subplot(326)
 plt.plot(roc_list)
-plt.title('ROC_AUC')
-plt.ylabel('ROC_AUC')
+# plt.title('ROC_AUC')
+# plt.ylabel('ROC_AUC')
 plt.xlabel('Epoch')
-plt.legend(['ROC_AUC'], loc='upper left')
+# plt.legend(['ROC_AUC'], loc='upper left')
 
 plt.show()
