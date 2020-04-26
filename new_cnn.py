@@ -1,9 +1,9 @@
-
 from __future__ import print_function
 
 from pathlib import Path
 
 import numpy as np
+from keras.utils import to_categorical
 
 import my_path
 import matplotlib.pyplot as plt
@@ -38,6 +38,7 @@ def wordIdxLookup(word, word_idx_map):
     if word in word_idx_map:
         return word_idx_map[word]
 
+
 class RocAucEvaluation(Callback):
     def __init__(self, validation_data=(), interval=1):
         super(Callback, self).__init__()
@@ -53,10 +54,10 @@ class RocAucEvaluation(Callback):
 
 
 data_path = Path(my_path.pkl_dir, 'data.pkl.gz')
-emotion_path = Path(my_path.pkl_dir, 'emotion.pkl.gz')
+# emotion_path = Path(my_path.pkl_dir, 'emotion.pkl.gz')
 
 data = pkl.load(gzip.open(data_path, "rb"))
-emotionDict = pkl.load(gzip.open(emotion_path, "rb"))
+# emotionDict = pkl.load(gzip.open(emotion_path, "rb"))
 print("ShareData loaded!")
 
 train_labels = data['train']['labels']
@@ -70,8 +71,8 @@ test_sentences = data['test']['sentences']
 
 word_embeddings = data['wordEmbeddings']
 
-neg_weights = emotionDict['neg']
-pos_weights = emotionDict['pos']
+# neg_weights = emotionDict['neg']
+# pos_weights = emotionDict['pos']
 n_out = 10
 # :: Find the longest sentence in our dataset ::
 max_sentence_len = 0
@@ -124,11 +125,10 @@ for filter_length in filter_lengths:
                                padding='same',
                                activation='tanh',
                                strides=1)(words)
-    # words_conv = GlobalMaxPooling1D()(words_conv)
+    words_conv = GlobalMaxPooling1D()(words_conv)
     words_convolutions.append(words_conv)
 
 output = concatenate(words_convolutions)
-
 
 # We add a vanilla hidden layer together with dropout layers:
 output = Dropout(0.5)(output)
@@ -165,18 +165,19 @@ output = Dropout(0.5)(output)
 # output = concatenate([output, cnn_word_filter_neg_out, cnn_word_filter_pos_out])
 
 #########################################################################3333
-output = Dense(hidden_dims, activation='tanh', kernel_regularizer=keras.regularizers.l1_l2(0.001))(output)
-output = GlobalMaxPooling1D()(output)
-output = Dropout(0.5)(output)
+# output = Dense(hidden_dims, activation='tanh', kernel_regularizer=keras.regularizers.l1_l2(0.001))(output)
+output = Dense(hidden_dims, activation='tanh', kernel_regularizer=keras.regularizers.l2(0.01))(output)
+# output = GlobalMaxPooling1D()(output)
+output = Dropout(0.25)(output)
 
 # We project onto a single unit output layer, and squash it with a sigmoid:
 # output = Dense(1, activation='sigmoid')(output)
-output = Dense(1, activation='softmax')(output)
+output = Dense(10, activation='softmax', kernel_regularizer=keras.regularizers.l2(0.01))(output)
 # output = Dense(1, activation='sigmoid')(output)
 
 
 model = Model(inputs=[words_input], outputs=[output])
-model.compile(loss='binary_crossentropy', optimizer='adam',
+model.compile(loss='categorical_crossentropy', optimizer='adam',
               metrics=['acc', evaluation.F1, evaluation.Recall, evaluation.Precision])
 
 model.summary()
@@ -184,10 +185,11 @@ model.summary()
 # RocAuc = RocAucEvaluation(validation_data=(X_dev,y_dev), interval=1)
 # history = model.fit(X_train, y_train, batch_size=batch_size, epochs=15, validation_data=[X_dev, y_dev],callbacks=[RocAuc], verbose=2)
 
-x_train, y_train, x_label, y_label = train_test_split(X_train, y_train, train_size=0.95, random_state=233)
+# x_train, y_train, x_label, y_label = train_test_split(X_train, y_train, train_size=0.95, random_state=233)
 # RocAuc = RocAucEvaluation(validation_data=(y_train, y_label), interval=1)
-history = model.fit(x_train, x_label, batch_size=batch_size, epochs=nb_epoch, validation_data=[y_train, y_label],shuffle=True,
-                    )
+y_train = to_categorical(y_train, 10)
+y_dev = to_categorical(y_dev, 10)
+history = model.fit(X_train, y_train, batch_size=batch_size, epochs=nb_epoch, validation_data=[X_dev, y_dev])
 
 
 def my_plot(data_list, title, label_list, position):

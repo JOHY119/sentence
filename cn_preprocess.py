@@ -64,6 +64,7 @@ def createMatrices(sentences, word2Idx, stop_words):
     return xMatrix
 
 
+
 def get_label(word):
     return categories.index(word)
 
@@ -166,6 +167,7 @@ if __name__ == '__main__':
     train_matrix = createMatrices(trainDataset[0], word2Idx, stop_word_dict)
     dev_matrix = createMatrices(devDataset[0], word2Idx, stop_word_dict)
     test_matrix = createMatrices(testDataset[0], word2Idx, stop_word_dict)
+
 
     data = {
         'wordEmbeddings': wordEmbeddings, 'word2Idx': word2Idx,
