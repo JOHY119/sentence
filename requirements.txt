@@ -1,6 +1,6 @@
 matplotlib
 numpy
-setuptools==41.2.0
+setuptools==65.5.1
 tensorflow==1.14.0
 tensorflow-gpu==1.14.0
 Keras==2.2.5
